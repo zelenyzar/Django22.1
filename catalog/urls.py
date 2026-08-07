@@ -10,8 +10,6 @@ app_name = CatalogConfig.name
 urlpatterns = [
     path('', views.products_list, name='products_list'),
     path('<int:pk>/', views.product_detail, name='product_detail'),
-    # path("products_list/", products_list, name="products_list"),
-    # path("product_detail/<int:product_id>", product_detail, name="product_detail"),
 ]
 
 if settings.DEBUG:
