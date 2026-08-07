@@ -3,7 +3,6 @@ from django.urls import path
 from catalog.apps import CatalogConfig
 from . import views
 from django.conf import settings
-from .views import products_list, product_detail
 
 app_name = CatalogConfig.name
 
