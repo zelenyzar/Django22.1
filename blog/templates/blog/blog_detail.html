@@ -1,0 +1,48 @@
+{% extends 'catalog/base.html' %}
+
+{% block content %}
+  <div class="container py-4">
+    <div class="row">
+      <div class="col-md-10 offset-md-1">
+
+        <article class="card shadow-sm border-0 position-relative overflow-hidden">
+
+          {% if object.image %}
+            <div class="position-absolute w-100 h-100 top-0 start-0 z-0">
+              <img src="{{ object.image.url }}" class="w-100 h-100 object-fit-cover"
+                   style="opacity: 0.6; filter: brightness(0.8);"
+                   alt="{{ object.title }}" loading="lazy">
+
+              <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-50"></div>
+            </div>
+          {% endif %}
+
+          <div class="card-body position-relative z-1 p-4">
+            <span class="badge bg-secondary mb-2">
+              {{ object.created_at|date:"d.m.Y" }}
+            </span>
+            {% if not object.is_published %}
+              <span class="badge bg-warning text-dark ms-2">Черновик</span>
+            {% endif %}
+
+            <h1 class="display-4 fw-bold text-white mb-3">{{ object.title }}</h1>
+
+            <div class="content-body mb-4">
+
+              <p class="fs-1 font-italic text-white">{{ object.content|linebreaks }}</p>
+            </div>
+
+            <hr class="border-white my-4 opacity-25">
+
+            <div class="d-flex justify-content-between align-items-center mt-4">
+              <a href="{% url 'blog:blog_list' %}" class="btn btn-light">← Назад в блог</a>
+              {% if user.is_authenticated %}
+                <a href="{% url 'blog:blog_update' object.pk %}" class="btn btn-light">Редактировать</a>
+              {% endif %}
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+{% endblock %}
