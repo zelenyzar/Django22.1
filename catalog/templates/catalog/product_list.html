@@ -1,0 +1,55 @@
+{% extends 'catalog/base.html' %}
+{% block content %}
+<div class="album py-5 bg-body-tertiary">
+    <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Каталог продуктов</h2>
+            <a href="{% url 'catalog:product_create' %}" class="btn btn-primary">
+                Добавить продукт
+            </a>
+        </div>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+            {% for product in products %}
+            <div class="col">
+                <div class="card shadow-sm">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" class="card-img-top" style="height: 300px; object-fit: cover;">
+                    {% else %}
+                    <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height:300px;">
+                        Нет фото
+                    </div>
+                    {% endif %}
+
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+
+                        {% if product.description %}
+                            <p class="card-text">{{ product.description|truncatechars:100 }}</p>
+                        {% else %}
+                            <p class="card-text text-muted">Тут никто ничего не придумал</p>
+                        {% endif %}
+
+                        <div class="mt-auto d-flex flex-column gap-2">
+                            <div class="d-flex gap-2">
+                                <a class="btn btn-sm btn-primary"
+                                   href="{% url 'catalog:product_detail' product.pk %}"
+                                   role="button">Посмотреть</a>
+                                <a class="btn btn-sm btn-warning"
+                                   href="{% url 'catalog:product_update' product.pk %}"
+                                   role="button">Изменить</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <p class="lead">Продуктов пока нет. Добавьте первый!</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+  </div>
+{% endblock %}
