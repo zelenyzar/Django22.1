@@ -1,0 +1,66 @@
+{% extends 'catalog/base.html' %}
+{% block content %}
+<style>
+  @keyframes fadeInGlow {
+    0% {
+      opacity: 0;
+      transform: translateY(10px);
+      box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.2);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+      box-shadow: 0 0 16px 4px rgba(220, 53, 69, 0.35);
+    }
+  }
+
+  .alert-glow-box {
+    animation: fadeInGlow 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  }
+
+  .dark-mode .alert-glow-box {
+    box-shadow: 0 0 20px 6px rgba(255, 87, 34, 0.4) !important;
+  }
+</style>
+
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card border-start-5 border-danger shadow-sm border-5 h-100">
+        <div class="card-header bg-body text-body fw-bold py-3">
+          <h4 class="mb-0 d-flex align-items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-exclamation-circle flex-shrink-0" viewBox="0 0 24 20">
+              <path d="M8 4a4 4 0 1 0 8 0 4 4 0 0 0-8 0z"/>
+              <path d="M4.92 12c-.41 0-.36.19-.36.42v2.5c0 .23.05.42.36.42h14.28c.31 0 .36-.19.36-.42v-2.5c0-.23-.05-.42-.36-.42H4.92z"/>
+            </svg>
+            Подтверждение удаления
+          </h4>
+        </div>
+        <div class="card-body d-flex flex-column p-4">
+          <div class="bg-body-tertiary p-4 rounded mb-4 alert-glow-box">
+            <h5 class="fw-bold mb-2 text-body">
+              Вы действительно хотите удалить продукт?
+            </h5>
+            <p class="mb-3 text-body-secondary">
+              Продукт «<strong class="text-body">{{ object.name }}</strong>» будет безвозвратно удалён.
+              Это действие нельзя отменить.
+            </p>
+          </div>
+
+          <form method="post" class="mt-auto">
+            {% csrf_token %}
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-danger btn-lg px-4 shadow-sm flex-grow-1">
+                Да, удалить
+              </button>
+              <a href="{% url 'catalog:products_list' %}" class="btn btn-secondary btn-lg px-4 shadow-sm align-self-center flex-grow-1">
+                Отмена
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
