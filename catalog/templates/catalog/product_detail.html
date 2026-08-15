@@ -45,12 +45,14 @@
                             <a href="{% url 'catalog:products_list' %}" class="btn btn-outline-secondary me-2">
                                 ← Назад в каталог
                             </a>
+                            {% if user.is_authenticated %}
                             <a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-warning">
                                 Редактировать
                             </a>
                             <a href="{% url 'catalog:product_delete' product.pk %}" class="btn btn-danger">
                                 Удалить
                             </a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
