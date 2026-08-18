@@ -6,7 +6,7 @@ from .views import (
     ProductDetailView,
     ProductCreateView,
     ProductUpdateView,
-    ProductDeleteView,
+    ProductDeleteView, UnpublishProductView,
 )
 from django.conf import settings
 
@@ -19,6 +19,7 @@ urlpatterns = [
     path('create/', ProductCreateView.as_view(), name='product_create'),
     path('<int:pk>/update/', ProductUpdateView.as_view(), name='product_update'),
     path('<int:pk>/delete/', ProductDeleteView.as_view(), name='product_delete'),
+    path("<int:pk>/unpublish/", UnpublishProductView.as_view(), name="product_unpublish"),
 
 ]
 
