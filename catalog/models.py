@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.db import models
+
 
 
 class Category(models.Model):
@@ -32,7 +34,7 @@ class Product(models.Model):
         blank=True,
         null=True,
         verbose_name="Описание",
-        help_text="Введите описсание нужного вам продукта",
+        help_text="Введите описание нужного вам продукта",
     )
     image = models.ImageField(
         upload_to="catalog/photo",
@@ -56,10 +58,29 @@ class Product(models.Model):
         verbose_name="Дата последнего изменения"
     )
 
+    is_published = models.BooleanField(
+        default=False,
+        verbose_name='Опубликован',
+        help_text='Если отмечено,будет виден в каталоге'
+    )
+
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='products',
+        verbose_name='Владелец',
+        blank=True,
+        null=True,
+        help_text='Пользователь, опубликовавший продукт',
+    )
+
     class Meta:
         verbose_name = "Продукт"
         verbose_name_plural = "Продукты"
         ordering = ["-created_at", "-updated_at", "category", "price"]
+        permissions = [
+            ("can_unpublish_product", "Может снимать продукты с публикации"),
+        ]
 
     def __str__(self):
         return self.name
