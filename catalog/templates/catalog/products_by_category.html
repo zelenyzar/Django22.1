@@ -30,8 +30,6 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             {% if category_obj %}
                 <h2>Категория: {{ category_obj.name }}</h2>
-            {% else %}
-                <h2>Каталог продуктов</h2>
             {% endif %}
 
             {% if user.is_authenticated and can_change_product %}

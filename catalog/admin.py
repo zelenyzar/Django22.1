@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.core.cache import cache
+
 from catalog.models import Product, Category
 
 
@@ -20,6 +22,10 @@ class ProductAdmin(admin.ModelAdmin):
     def unpublish(self, request, queryset):
         queryset.update(is_published=False)
     unpublish.short_description = 'Снять с публикации выбранные товары'
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        cache.clear()
 
 
 @admin.register(Category)

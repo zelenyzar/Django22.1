@@ -1,5 +1,3 @@
-from itertools import product
-
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.shortcuts import render, get_object_or_404, redirect
@@ -7,8 +5,9 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView,  UpdateView, DeleteView
 from django.urls import reverse_lazy
-from catalog.models import Product
+from catalog.models import Product, Category
 from catalog.forms import ProductForm
+from catalog.services import get_products_by_category
 
 
 class ProductListView(ListView):
@@ -17,16 +16,26 @@ class ProductListView(ListView):
     context_object_name = "products"
 
     def get_queryset(self):
-        return Product.objects.filter(is_published=True)
+        qs = Product.objects.filter(is_published=True)
+        category_slug = self.request.GET.get("category")
+        if category_slug:
+            qs = qs.filter(category__slug=category_slug)
+        return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-
         context["can_unpublish_product"] = user.has_perm("catalog.can_unpublish_product")
         context["can_delete_product"] = user.has_perm("catalog.delete_product")
         context["can_change_product"] = user.has_perm("catalog.change_product")
 
+        context["categories"] = Category.objects.all()
+        category_slug = self.request.GET.get("category")
+        context["category_selected"] = category_slug
+        if category_slug:
+            context["category_obj"] = get_object_or_404(Category, slug=category_slug)
+        else:
+            context["category_obj"] = None
         return context
 
 
@@ -99,4 +108,17 @@ class UnpublishProductView(View):
         product.save(update_fields=["is_published"])
         return redirect("catalog:products_list")
 
+def products_by_category(request, category_slug):
+    category = get_object_or_404(Category, slug=category_slug)
+    products = get_products_by_category(category_slug)
 
+    user = request.user
+    context = {
+        "category": category,
+        "products": products,
+        "categories": Category.objects.all(),
+        "can_unpublish_product": user.has_perm("catalog.can_unpublish_product"),
+        "can_delete_product": user.has_perm("catalog.delete_product"),
+        "can_change_product": user.has_perm("catalog.change_product"),
+    }
+    return render(request, "catalog/products_list.html", context)
