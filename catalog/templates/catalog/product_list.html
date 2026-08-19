@@ -1,0 +1,113 @@
+{% extends 'catalog/base.html' %}
+
+{% block content %}
+<div class="album py-5 bg-body-tertiary">
+    <div class="container">
+
+        <form method="get" class="mb-4">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4 col-sm-6">
+                    <label for="category-filter" class="form-label">Категория</label>
+                    <select name="category" id="category-filter" class="form-select">
+                        <option value="">Все категории</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat.slug }}" {% if category_selected == cat.slug %}selected{% endif %}>
+                                {{ cat.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-8 col-sm-6 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Применить фильтр</button>
+                    {% if category_selected %}
+                        <a href="{% url 'catalog:products_list' %}" class="btn btn-outline-secondary">Сбросить</a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            {% if category_obj %}
+                <h2>Категория: {{ category_obj.name }}</h2>
+            {% else %}
+                <h2>Каталог продуктов</h2>
+            {% endif %}
+
+            {% if user.is_authenticated and can_change_product %}
+                <a href="{% url 'catalog:product_create' %}" class="btn btn-primary">
+                    Добавить продукт
+                </a>
+            {% endif %}
+        </div>
+
+        {% cache 300 products_list_grid category_selected %}
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+            {% for product in products %}
+            <div class="col">
+                <div class="card shadow-sm h-100">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" class="card-img-top" style="height: 300px; object-fit: cover;">
+                    {% else %}
+                    <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height:300px;">
+                        Нет фото
+                    </div>
+                    {% endif %}
+
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ product.name }}</h5>
+
+                        {% if product.description %}
+                            <p class="card-text">{{ product.description|truncatechars:100 }}</p>
+                        {% else %}
+                            <p class="card-text text-muted">Описание отсутствует</p>
+                        {% endif %}
+
+                        <div class="mt-auto d-flex flex-wrap gap-2 align-items-center">
+                            <a class="btn btn-chameleon flex-grow-1" href="{% url 'catalog:product_detail' product.pk %}" role="button">
+                                Подробнее
+                            </a>
+
+                            <div class="d-flex gap-2 mt-2 mt-md-0 flex-wrap">
+                                {% if user == product.owner or can_change_product %}
+                                <a class="btn btn-chameleon btn-chameleon-edit flex-grow-1" href="{% url 'catalog:product_update' product.pk %}" role="button">
+                                    Изменить
+                                </a>
+                                {% endif %}
+
+                                <div class="d-flex gap-2 mt-2 mt-md-0">
+                                    {% if product.is_published and can_unpublish_product %}
+                                    <form method="post" action="{% url 'catalog:product_unpublish' product.pk %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-chameleon btn-chameleon-unpub flex-grow-1">
+                                            Снять с публикации
+                                        </button>
+                                    </form>
+                                    {% endif %}
+
+                                    {% if user == product.owner or can_delete_product %}
+                                    <a class="btn btn-chameleon btn-chameleon-delete flex-grow-1" href="{% url 'catalog:product_delete' product.pk %}" role="button">
+                                        Удалить
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <p class="lead">
+                    {% if category_obj %}
+                    В категории «{{ category_obj.name }}» пока нет опубликованных товаров.
+                    {% else %}
+                    Продуктов пока нет. Добавьте первый!
+                    {% endif %}
+                </p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
